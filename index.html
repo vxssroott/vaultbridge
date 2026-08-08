@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VaultBridge — Transfer Platform</title>
+    <title>VaultBridge — Moniepoint Platform</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
@@ -109,21 +109,6 @@
         }
         input:focus, select:focus { border-color: #5b9bd5; }
 
-        .bank-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 12px 0 6px;
-        }
-        .bank-tag {
-            background: #0f1620;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 12px;
-            border: 1px solid #2a3440;
-            color: #a0b3cc;
-        }
-
         .btn {
             width: 100%;
             padding: 14px;
@@ -140,21 +125,12 @@
         .btn:hover { background: #4a8ac4; }
         .btn:disabled { background: #2a3a4a; cursor: not-allowed; }
 
-        .btn-otp { background: #2a3a4a; margin-top: 0; }
-        .btn-otp.active { background: #5b9bd5; }
+        .btn-secondary {
+            background: #2a3a4a;
+        }
+        .btn-secondary:hover { background: #1e2a3a; }
 
-        .otp-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #2a3440;
-        }
-        .otp-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .otp-row input { flex: 1; }
-        .otp-row .btn { width: auto; padding: 12px 24px; margin-top: 0; }
+        .btn-secondary i { margin-right: 8px; }
 
         .log-entry {
             background: #0f1620;
@@ -196,6 +172,38 @@
             font-size: 14px;
             z-index: 999;
         }
+
+        .empty-state {
+            color: #6a7f99;
+            text-align: center;
+            padding: 30px 0;
+            font-size: 14px;
+        }
+
+        .balance-stats {
+            margin-top: 18px;
+            background: #0f1620;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .balance-stats .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .balance-stats .stat-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .balance-stats .stat-value {
+            font-weight: 600;
+        }
+
+        .stat-value.green { color: #7ddfb3; }
+        .stat-value.blue { color: #5b9bd5; }
     </style>
 </head>
 <body>
@@ -205,7 +213,7 @@
     <!-- HEADER -->
     <div class="header">
         <div class="logo">Vault<span>Bridge</span> <i class="fas fa-shield-alt" style="font-size:18px; color:#5b9bd5; margin-left:8px;"></i></div>
-        <div class="status-badge"><i class="fas fa-circle" style="font-size:10px; margin-right:6px; color:#7ddfb3;"></i> <span id="sessionStatus">2 Active Sessions</span></div>
+        <div class="status-badge"><i class="fas fa-circle" style="font-size:10px; margin-right:6px; color:#7ddfb3;"></i> <span id="sessionStatus">Online — Moniepoint</span></div>
     </div>
 
     <!-- MAIN GRID -->
@@ -229,80 +237,41 @@
 
             <div class="form-group">
                 <label>Account Number</label>
-                <input type="text" id="accountNumber" value="0123456789" placeholder="Enter 10-digit account number" />
+                <input type="text" id="accountNumber" placeholder="Enter 10-digit account number" />
             </div>
 
             <div class="form-group">
-                <label>Account Name</label>
-                <input type="text" id="accountName" value="Oluwaseun Adebayo" placeholder="Account holder name" />
+                <label>Account Name (Resolved)</label>
+                <input type="text" id="accountName" placeholder="Will auto-fill after validation" readonly />
             </div>
 
             <div class="form-group">
                 <label>Amount (₦)</label>
-                <input type="number" id="amount" value="250000" placeholder="Enter amount" />
+                <input type="number" id="amount" placeholder="Enter amount" />
             </div>
 
-            <div class="bank-list">
-                <span class="bank-tag"><i class="fas fa-check-circle" style="color:#7ddfb3; margin-right:4px;"></i> GTBank</span>
-                <span class="bank-tag"><i class="fas fa-check-circle" style="color:#7ddfb3; margin-right:4px;"></i> Access</span>
-                <span class="bank-tag"><i class="fas fa-check-circle" style="color:#7ddfb3; margin-right:4px;"></i> UBA</span>
-                <span class="bank-tag"><i class="fas fa-check-circle" style="color:#7ddfb3; margin-right:4px;"></i> Moniepoint</span>
-            </div>
-
-            <button class="btn" id="transferBtn"><i class="fas fa-rocket" style="margin-right:10px;"></i> Validate & Transfer</button>
-
-            <!-- OTP BYPASS -->
-            <div class="otp-section">
-                <div class="card-title" style="font-size:14px;"><i class="fas fa-shield-alt"></i> OTP Bypass Module</div>
-                <div class="otp-row">
-                    <input type="text" id="otpInput" placeholder="Enter OTP (or use bypass)" value="123456" />
-                    <button class="btn btn-otp active" id="otpBypassBtn"><i class="fas fa-bolt"></i> Bypass</button>
-                </div>
-                <div style="margin-top:10px; font-size:13px; color:#6a7f99; display:flex; gap:16px;">
-                    <span><i class="fas fa-check-circle" style="color:#7ddfb3;"></i> SIM interception active</span>
-                    <span><i class="fas fa-clock" style="color:#f0b34b;"></i> <span id="otpTimer">12s</span> remaining</span>
-                </div>
-            </div>
+            <button class="btn btn-secondary" id="validateBtn"><i class="fas fa-search"></i> Validate Account</button>
+            <button class="btn" id="transferBtn"><i class="fas fa-rocket"></i> Transfer</button>
         </div>
 
         <!-- RIGHT: DASHBOARD + LOGS -->
         <div class="card">
             <div class="card-title"><i class="fas fa-list-ul"></i> Recent Transfers</div>
             <div id="logContainer">
-                <div class="log-entry">
-                    <div>
-                        <strong>GTBank</strong> — 0123456789<br />
-                        <span class="log-meta">Oluwaseun Adebayo • 5 mins ago</span>
-                    </div>
-                    <div class="amount">₦250,000</div>
-                </div>
-                <div class="log-entry">
-                    <div>
-                        <strong>Access Bank</strong> — 9876543210<br />
-                        <span class="log-meta">Chidinma Eze • 22 mins ago</span>
-                    </div>
-                    <div class="amount">₦1,200,000</div>
-                </div>
-                <div class="log-entry failed">
-                    <div>
-                        <strong>UBA</strong> — 4567891230<br />
-                        <span class="log-meta">Emeka Okafor • 1 hour ago</span>
-                    </div>
-                    <div class="amount" style="color:#d97a8a;">₦0 <span style="font-weight:400; color:#6a7f99; font-size:12px;">(OTP failed)</span></div>
-                </div>
+                <div class="empty-state">No transfers yet</div>
             </div>
-            <div style="margin-top: 12px;">
-                <button class="btn" id="refreshLogsBtn" style="background: #1e2a3a; color:#a0b3cc;"><i class="fas fa-sync-alt" style="margin-right:8px;"></i> Refresh Logs</button>
-            </div>
-            <div style="margin-top: 18px; background: #0f1620; border-radius: 12px; padding: 16px;">
-                <div style="display: flex; justify-content: space-between; font-size: 14px;">
+            <button class="btn btn-secondary" id="refreshLogsBtn"><i class="fas fa-sync-alt"></i> Refresh Logs</button>
+
+            <div class="balance-stats">
+                <div class="stat-row">
                     <span>Total transferred (today)</span>
-                    <span style="color: #7ddfb3; font-weight: 600;" id="totalTransferred">₦1,535,000</span>
+                    <span class="stat-value green" id="totalTransferred">₦0</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-top: 6px;">
-                    <span>OTP bypass rate</span>
-                    <span style="color: #5b9bd5; font-weight: 600;" id="bypassRate">94%</span>
+                <div class="stat-row">
+                    <span>Moniepoint Balance</span>
+                    <span class="stat-value blue" id="moniepointBalance">₦0</span>
                 </div>
+                <button class="btn btn-secondary" id="balanceBtn" style="margin-top:12px; padding:10px;"><i class="fas fa-wallet"></i> Refresh Balance</button>
             </div>
         </div>
 
@@ -310,8 +279,8 @@
 
     <!-- FOOTER -->
     <div class="footer-note">
-        <span><i class="fas fa-lock" style="margin-right:6px;"></i> End‑to‑end encrypted • No logs stored</span>
-        <span>v1.2.0 <i class="fas fa-circle" style="font-size:6px; margin:0 8px; color:#2a3440;"></i> <span style="color:#7ddfb3;" id="liveStatus">● Live</span></span>
+        <span><i class="fas fa-lock" style="margin-right:6px;"></i> Powered by Moniepoint API</span>
+        <span>v2.0 <i class="fas fa-circle" style="font-size:6px; margin:0 8px; color:#2a3440;"></i> <span style="color:#7ddfb3;" id="liveStatus">● Live</span></span>
     </div>
 
 </div>
@@ -321,29 +290,27 @@
 
 <script>
     // ============================================================
-    // VAULTBRIDGE — FRONTEND LOGIC (GitHub Pages Ready)
+    // VAULTBRIDGE — FRONTEND LOGIC (Moniepoint Integration)
     // ============================================================
 
-    // CONFIG — Replace with your actual API endpoint
+    // CONFIG — Replace with your actual backend API URL
     const API_BASE = 'https://your-api-server.com/api'; // ← CHANGE THIS
 
-    // DOM elements
+    // DOM Elements
     const bankSelect = document.getElementById('bankSelect');
     const accountNumber = document.getElementById('accountNumber');
     const accountName = document.getElementById('accountName');
     const amount = document.getElementById('amount');
+    const validateBtn = document.getElementById('validateBtn');
     const transferBtn = document.getElementById('transferBtn');
-    const otpInput = document.getElementById('otpInput');
-    const otpBypassBtn = document.getElementById('otpBypassBtn');
     const logContainer = document.getElementById('logContainer');
     const refreshLogsBtn = document.getElementById('refreshLogsBtn');
     const totalTransferred = document.getElementById('totalTransferred');
-    const bypassRate = document.getElementById('bypassRate');
-    const sessionStatus = document.getElementById('sessionStatus');
-    const otpTimer = document.getElementById('otpTimer');
+    const moniepointBalance = document.getElementById('moniepointBalance');
+    const balanceBtn = document.getElementById('balanceBtn');
     const toast = document.getElementById('toast');
 
-    // ===== HELPER: SHOW TOAST =====
+    // ===== TOAST NOTIFICATION =====
     function showToast(msg, isError = false) {
         toast.textContent = msg;
         toast.style.background = isError ? '#3a1a2a' : '#1e3a2a';
@@ -353,32 +320,49 @@
         setTimeout(() => { toast.style.display = 'none'; }, 4000);
     }
 
-    // ===== API CALLS =====
+    // ===== API CALL =====
     async function callAPI(endpoint, method = 'POST', data = {}) {
         const url = `${API_BASE}${endpoint}`;
         try {
             const response = await fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: method === 'GET' ? undefined : JSON.stringify(data)
             });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return await response.json();
         } catch (err) {
-            console.error('API Error:', err);
             showToast('API error: ' + err.message, true);
             return null;
         }
     }
 
-    // ===== VALIDATE & TRANSFER =====
+    // ===== VALIDATE ACCOUNT =====
+    validateBtn.addEventListener('click', async function() {
+        const bank = bankSelect.value;
+        const account = accountNumber.value.trim();
+        if (!account || account.length !== 10) {
+            showToast('Enter a valid 10-digit account number', true);
+            return;
+        }
+        validateBtn.disabled = true;
+        validateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validating...';
+        const result = await callAPI('/validate', 'POST', { bank, account_number: account });
+        validateBtn.disabled = false;
+        validateBtn.innerHTML = '<i class="fas fa-search"></i> Validate Account';
+        if (result && result.status === 'valid') {
+            accountName.value = result.account_name || 'Unknown';
+            showToast(`✅ Account validated: ${result.account_name}`);
+        } else {
+            showToast('❌ Validation failed: ' + (result?.error || 'Unknown error'), true);
+        }
+    });
+
+    // ===== TRANSFER =====
     transferBtn.addEventListener('click', async function() {
         const bank = bankSelect.value;
         const account = accountNumber.value.trim();
-        const name = accountName.value.trim();
         const amt = parseInt(amount.value);
-        const otp = otpInput.value.trim();
-
         if (!account || account.length !== 10) {
             showToast('Enter a valid 10-digit account number', true);
             return;
@@ -387,58 +371,28 @@
             showToast('Enter a valid amount (min ₦100)', true);
             return;
         }
-
         transferBtn.disabled = true;
         transferBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-        // Validate account
-        const validateResult = await callAPI('/validate', 'POST', { bank, account_number: account });
-        if (!validateResult || validateResult.status !== 'valid') {
-            showToast('Account validation failed: ' + (validateResult?.error || 'Unknown error'), true);
-            transferBtn.disabled = false;
-            transferBtn.innerHTML = '<i class="fas fa-rocket" style="margin-right:10px;"></i> Validate & Transfer';
-            return;
-        }
-
-        // Execute transfer
-        const transferResult = await callAPI('/transfer', 'POST', {
+        const result = await callAPI('/transfer', 'POST', {
             bank,
             account_number: account,
-            amount: amt,
-            otp: otp,
-            bypass_method: 'sim'
+            amount: amt
         });
-
-        if (transferResult && transferResult.status === 'success') {
-            showToast(`✅ Transfer successful: ₦${amt.toLocaleString()} to ${account}`);
-            // Update logs
-            refreshLogs();
-        } else {
-            showToast('❌ Transfer failed: ' + (transferResult?.error || 'Unknown error'), true);
-        }
-
         transferBtn.disabled = false;
-        transferBtn.innerHTML = '<i class="fas fa-rocket" style="margin-right:10px;"></i> Validate & Transfer';
-    });
-
-    // ===== OTP BYPASS =====
-    otpBypassBtn.addEventListener('click', function() {
-        otpInput.value = 'BYPassed_' + Math.floor(100000 + Math.random() * 900000);
-        showToast('🔓 OTP bypassed via SIM interception');
-        // Simulate timer reset
-        otpTimer.textContent = '12s';
-        let countdown = 12;
-        const timer = setInterval(() => {
-            countdown -= 1;
-            otpTimer.textContent = countdown + 's';
-            if (countdown <= 0) clearInterval(timer);
-        }, 1000);
+        transferBtn.innerHTML = '<i class="fas fa-rocket"></i> Transfer';
+        if (result && result.status === 'success') {
+            showToast(`✅ Transfer successful: ₦${amt.toLocaleString()} to ${account}`);
+            refreshLogs();
+            refreshBalance();
+        } else {
+            showToast('❌ Transfer failed: ' + (result?.error || 'Unknown error'), true);
+        }
     });
 
     // ===== REFRESH LOGS =====
     async function refreshLogs() {
         const logs = await callAPI('/logs', 'GET');
-        if (logs && Array.isArray(logs)) {
+        if (logs && Array.isArray(logs) && logs.length > 0) {
             logContainer.innerHTML = logs.map(log => `
                 <div class="log-entry ${log.status === 'failed' ? 'failed' : ''}">
                     <div>
@@ -448,40 +402,34 @@
                     <div class="amount">₦${log.amount.toLocaleString()}</div>
                 </div>
             `).join('');
-            // Update stats
             const total = logs.reduce((sum, l) => sum + (l.status === 'success' ? l.amount : 0), 0);
             totalTransferred.textContent = `₦${total.toLocaleString()}`;
-            const successCount = logs.filter(l => l.status === 'success').length;
-            bypassRate.textContent = logs.length ? Math.round((successCount / logs.length) * 100) + '%' : '0%';
-        }
-    }
-
-    refreshLogsBtn.addEventListener('click', refreshLogs);
-
-    // ===== SESSION STATUS =====
-    async function updateStatus() {
-        const status = await callAPI('/status', 'GET');
-        if (status && status.status === 'online') {
-            sessionStatus.textContent = '2 Active Sessions';
-            document.getElementById('liveStatus').textContent = '● Live';
         } else {
-            sessionStatus.textContent = 'Offline';
-            document.getElementById('liveStatus').textContent = '● Offline';
+            logContainer.innerHTML = '<div class="empty-state">No transfers yet</div>';
+            totalTransferred.textContent = '₦0';
         }
     }
+
+    // ===== REFRESH BALANCE =====
+    async function refreshBalance() {
+        const result = await callAPI('/balance', 'GET');
+        if (result && result.balance !== undefined) {
+            moniepointBalance.textContent = `₦${result.balance.toLocaleString()}`;
+        } else {
+            moniepointBalance.textContent = '₦0';
+        }
+    }
+
+    // ===== EVENT LISTENERS =====
+    refreshLogsBtn.addEventListener('click', refreshLogs);
+    balanceBtn.addEventListener('click', refreshBalance);
 
     // ===== INIT =====
-    updateStatus();
     refreshLogs();
-
-    // Auto-refresh every 30 seconds
-    setInterval(() => {
-        refreshLogs();
-        updateStatus();
-    }, 30000);
-
-    console.log('VaultBridge — Frontend ready.');
-    console.log('API_BASE:', API_BASE);
+    refreshBalance();
+    setInterval(refreshLogs, 30000);
+    setInterval(refreshBalance, 60000);
+    console.log('VaultBridge — Moniepoint Integration Ready');
 </script>
 
 </body>
